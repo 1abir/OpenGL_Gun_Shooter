@@ -1,0 +1,22 @@
+# depslib dependency file v1.0
+1616073742 source:c:\users\abirm\onedrive - ugrad.cse.buet.ac.bd\academic\4-1\graphics sessional\offline1\opengl_codeblocks\main.cpp
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<windows.h>
+	<glut.h>
+	<custom/camera.h>
+
+1392007564 c:\users\abirm\onedrive - ugrad.cse.buet.ac.bd\academic\4-1\graphics sessional\offline1\opengl_codeblocks\opengl\include\glut.h
+	<windows.h>
+	<GL/gl.h>
+	<GL/glu.h>
+
+1616064241 c:\users\abirm\onedrive - ugrad.cse.buet.ac.bd\academic\4-1\graphics sessional\offline1\opengl_codeblocks\opengl\include\custom\camera.h
+	<math.h>
+	<custom/vectors.h>
+
+1616063653 c:\users\abirm\onedrive - ugrad.cse.buet.ac.bd\academic\4-1\graphics sessional\offline1\opengl_codeblocks\opengl\include\custom\vectors.h
+	<cmath>
+	<iostream>
+
