@@ -4,7 +4,12 @@
 
 #include <windows.h>
 #include <glut.h>
+
+#include<vector>
 #include <custom/camera.h>
+
+
+using namespace std;
 
 #define BIG_RADIUS 15
 #define SMALL_RADIUS 5
@@ -14,7 +19,9 @@
 #define PLANE_OFFSET (BIG_RADIUS+SMALL_RADIUS+CILYNDER_LENGTH*2)
 
 
-FlynnVector3 axis(0,0,1), all_axis, cily_axis;
+FlynnVector3 axis, all_axis, cily_axis, plane_normal;
+vector<FlynnVector3> intersections;
+
 
 float rotateCylinderAngle=0;
 float rotate_all_angle = 0;
@@ -302,6 +309,17 @@ void drawSS()
 	glColor3f(1, 1, 0);
 	drawSquare(5);
 }
+FlynnVector3 rp = FlynnVector3(0.0, 0.0, 0.0);
+FlynnVector3 pp = FlynnVector3(0.0, 0.0, PLANE_OFFSET);
+
+void trigger()
+{
+	FlynnVector3 rv = axis;
+	FlynnVector3 ip = intersectPoint(rv, rp, plane_normal, pp);
+	cout<<ip<<endl;
+	intersections.push_back(ip);
+}
+
 /// q - all left
 /// w - all right
 /// e - hemi up
@@ -311,6 +329,13 @@ void drawSS()
 
 void drawGun(){
 	drawPlane(PLANE_SIDE,PLANE_OFFSET);
+	for (auto i = intersections.begin(); i < intersections.end(); i++)
+	{
+		
+	}
+	
+
+
 	glRotatef(rotate_all_angle, all_axis.x, all_axis.y, all_axis.z);
 	// glRotatef(rotate_all_angle, 0, 1, 0);
 
@@ -326,8 +351,8 @@ void drawGun(){
 	// glRotatef(rotate_cily_angle, 1, 0, 1);
 	glRotatef(rotate_cily_angle, cily_axis.x, cily_axis.y, cily_axis.z);
 
-	// glRotatef(rotateCylinderAngle, 0, 0, 1);
-	glRotatef(rotateCylinderAngle, axis.x,axis.y,axis.z);
+	glRotatef(rotateCylinderAngle, 0, 0, 1);
+	// glRotatef(rotateCylinderAngle, axis.x,axis.y,axis.z);
 
 	drawHemisphere(SMALL_RADIUS,12,10,-1);
 	drawCylinder(SMALL_RADIUS,CILYNDER_LENGTH,20);
@@ -369,37 +394,42 @@ void keyboardListener(unsigned char key, int x, int y)
 		if(rotate_all_angle<rotate_all_range) 
 		{
 			rotate_all_angle += 10;
-			
+			axis = axis.rotate(10,all_axis);
 		}
 		break;
 	case 'w':
 		if(rotate_all_angle>-1*rotate_all_range) 
 		{
 			rotate_all_angle -= 10;
+			axis = axis.rotate(-10,all_axis);
 		}
 		break;
 	case 'e':
 		if(rotate_hemi_angle<rotate_hemi_range) 
 		{
 			rotate_hemi_angle += 10;
+			axis = axis.rotate(10,cily_axis);
 		}
 		break;
 	case 'r':
 		if(rotate_hemi_angle>-1*rotate_hemi_range) 
 		{
 			rotate_hemi_angle -= 10;
+			axis = axis.rotate(-10,cily_axis);
 		}
 		break;
 	case 'a':
 		if(rotate_cily_angle<rotate_cily_range) 
 		{
 			rotate_cily_angle += 10;
+			axis = axis.rotate(+10,cily_axis);
 		}
 		break;
 	case 's':
 		if(rotate_cily_angle>-1*rotate_cily_range) 
 		{
 			rotate_cily_angle -= 10;
+			axis = axis.rotate(-10,cily_axis);
 		}
 		break;
 	default:
@@ -451,6 +481,7 @@ void mouseListener(int button, int state, int x, int y)
 		if (state == GLUT_DOWN)
 		{ // 2 times?? in ONE click? -- solution is checking DOWN or UP
 			drawaxes = 1 - drawaxes;
+			trigger();
 		}
 		break;
 
@@ -570,13 +601,10 @@ void init()
 	pos = FlynnVector3(100,100,0);
 
 	FlynnVector3 arbitrary(1,0,0);
-	if(axis==arbitrary)
-	{
-		arbitrary = FlynnVector3(0,0,1);
-	}
-
+	axis = FlynnVector3(0,0,1);
 	all_axis = axis.cross(arbitrary).normalized();
 	cily_axis = axis.cross(all_axis).normalized();
+	plane_normal = axis;
 
 }
 

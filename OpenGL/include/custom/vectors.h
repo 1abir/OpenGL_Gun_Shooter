@@ -139,4 +139,12 @@ FlynnVector3 FlynnVector3::rotate(double A, const FlynnVector3 &r)
 	return u * sin(A) + l * cos(A);
 }
 
+FlynnVector3 intersectPoint(FlynnVector3 rayVector, FlynnVector3 rayPoint, FlynnVector3 planeNormal, FlynnVector3 planePoint) {
+	FlynnVector3 diff = rayPoint - planePoint;
+	double prod1 = diff.dot(planeNormal);
+	double prod2 = rayVector.dot(planeNormal);
+	double prod3 = prod1 / prod2;
+	return rayPoint - rayVector * prod3;
+}
+
 #endif
