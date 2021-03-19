@@ -5,25 +5,23 @@
 #include <windows.h>
 #include <glut.h>
 
-#include<vector>
+#include <vector>
 #include <custom/camera.h>
-
 
 using namespace std;
 
 #define BIG_RADIUS 15
 #define SMALL_RADIUS 5
 #define RANGE 50
+#define STEP 5
 #define CILYNDER_LENGTH 50
 #define PLANE_SIDE 50
-#define PLANE_OFFSET (BIG_RADIUS+SMALL_RADIUS+CILYNDER_LENGTH*2)
-
+#define PLANE_OFFSET (BIG_RADIUS + SMALL_RADIUS + CILYNDER_LENGTH * 2)
 
 FlynnVector3 axis, all_axis, cily_axis, plane_normal;
 vector<FlynnVector3> intersections;
 
-
-float rotateCylinderAngle=0;
+float rotateCylinderAngle = 0;
 float rotate_all_angle = 0;
 
 const float rotate_all_range = RANGE;
@@ -36,8 +34,8 @@ const float rotate_cily_range = RANGE;
 
 double cameraHeight;
 double cameraAngle;
-int drawgrid;
-int drawaxes;
+int drawgrid=1;
+int drawaxes=1;
 double angle;
 
 struct point
@@ -109,7 +107,7 @@ void drawCircle(double radius, int segments)
 {
 	int i;
 	struct point points[100];
-	glColor3f(0.7, 0.7, 0.7);
+	glColor3f(1,0,0);
 	//generate points
 	for (i = 0; i <= segments; i++)
 	{
@@ -222,9 +220,11 @@ void drawHemisphere(double radius, int slices, int stacks, int upper_hemisphere)
 	{
 		for (j = 0; j < slices; j++)
 		{
-			if(j%2)shade=0;
-        	else shade=1;
-			glColor3f(shade,shade,shade);
+			if (j % 2)
+				shade = 0;
+			else
+				shade = 1;
+			glColor3f(shade, shade, shade);
 			glBegin(GL_QUADS);
 			{
 				//upper hemisphere
@@ -238,45 +238,117 @@ void drawHemisphere(double radius, int slices, int stacks, int upper_hemisphere)
 	}
 }
 
-void drawCylinder(float radius,float height,int segments)
+void drawInverseHemisphere(double radius, int slices, int stacks, int upper_hemisphere)
 {
-    int i;
-    float shade;
-    FlynnVector3 points[100];
-    //generate points
-    for(i=0;i<=segments;i++)
-    {
-        points[i].x=radius*cos(((double)i/(double)segments)*pi*2);
-        points[i].y=radius*sin(((double)i/(double)segments)*pi*2);
-    }
-    glColor3f(0,1.0,0);
-    //draw triangles using generated points
-    for(i=0;i<segments;i++)
-    {
-        if(i%2)shade=0;
-        else shade=1;
-        glColor3f(shade,shade,shade);
-
-        glBegin(GL_QUADS);
-        {
-			glVertex3f(points[i].x,points[i].y,0);
-			glVertex3f(points[i+1].x,points[i+1].y,0);
-			glVertex3f(points[i+1].x,points[i+1].y,height);
-			glVertex3f(points[i].x,points[i].y,height);
-        }
-        glEnd();
-    }
+	struct point points[100][100];
+	int i, j, shade;
+	double h, r;
+	//generate points
+	for (i = 0; i <= stacks; i++)
+	{
+		h = radius * sin(((double)i / (double)stacks) * (pi / 2));
+		r = radius * cos(((double)i / (double)stacks) * (pi / 2));
+		r = 2*radius - r;
+		for (j = 0; j <= slices; j++)
+		{
+			points[i][j].x = r * cos(((double)j / (double)slices) * 2 * pi);
+			points[i][j].y = r * sin(((double)j / (double)slices) * 2 * pi);
+			points[i][j].z = h;
+		}
+	}
+	//draw quads using generated points
+	for (i = 0; i < stacks; i++)
+	{
+		for (j = 0; j < slices; j++)
+		{
+			if (j % 2)
+				shade = 0;
+			else
+				shade = 1;
+			glColor3f(shade, shade, shade);
+			glBegin(GL_QUADS);
+			{
+				//upper hemisphere
+				glVertex3f(points[i][j].x, points[i][j].y, upper_hemisphere * points[i][j].z);
+				glVertex3f(points[i][j + 1].x, points[i][j + 1].y, upper_hemisphere * points[i][j + 1].z);
+				glVertex3f(points[i + 1][j + 1].x, points[i + 1][j + 1].y, upper_hemisphere * points[i + 1][j + 1].z);
+				glVertex3f(points[i + 1][j].x, points[i + 1][j].y, upper_hemisphere * points[i + 1][j].z);
+			}
+			glEnd();
+		}
+	}
 }
 
-void drawPlane(float a, float offset){
-    a = abs(a);
-    glColor3f(0.3,.3,.3);
-    glBegin(GL_QUADS);
-        glVertex3f( a, a,offset);
-        glVertex3f(-a, a,offset);
-        glVertex3f(-a,-a,offset);
-        glVertex3f( a,-a,offset);
-    glEnd();
+void drawCylinder(float radius, float height, int segments)
+{
+	int i;
+	float shade;
+	FlynnVector3 points[100];
+	//generate points
+	for (i = 0; i <= segments; i++)
+	{
+		points[i].x = radius * cos(((double)i / (double)segments) * pi * 2);
+		points[i].y = radius * sin(((double)i / (double)segments) * pi * 2);
+	}
+	glColor3f(0, 1.0, 0);
+	//draw triangles using generated points
+	for (i = 0; i < segments; i++)
+	{
+		if (i % 2)
+			shade = 0;
+		else
+			shade = 1;
+		glColor3f(shade, shade, shade);
+
+		glBegin(GL_QUADS);
+		{
+			glVertex3f(points[i].x, points[i].y, 0);
+			glVertex3f(points[i + 1].x, points[i + 1].y, 0);
+			glVertex3f(points[i + 1].x, points[i + 1].y, height);
+			glVertex3f(points[i].x, points[i].y, height);
+		}
+		glEnd();
+	}
+}
+
+void drawPlane(float a, float offset)
+{
+	a = abs(a);
+	glColor3f(0.3, .3, .3);
+	glBegin(GL_QUADS);
+	glVertex3f(a, a, offset);
+	glVertex3f(-a, a, offset);
+	glVertex3f(-a, -a, offset);
+	glVertex3f(a, -a, offset);
+	glEnd();
+}
+
+void drawPoint(float a,float b, float offset)
+{
+	glColor3f(1,0,0);
+	float width_by_4 = 1;
+	glBegin(GL_QUADS);
+	glVertex3f(a+width_by_4, b+width_by_4, offset);
+	glVertex3f(a-width_by_4, b+width_by_4, offset);
+	glVertex3f(a+width_by_4, b-width_by_4, offset);
+	glVertex3f(a-width_by_4, b-width_by_4, offset);
+	glEnd();
+}
+
+void drawBulletMarks()
+{
+	// glPushMatrix();
+	// {
+	// 	glTranslatef(0, 0, PLANE_OFFSET);
+		glColor3f(1, 0, 0);
+
+		for (auto i = intersections.begin(); i < intersections.end(); i++)
+		{
+			FlynnVector3 temp = *i;
+			drawPoint(temp.x,temp.y,temp.z-2);
+		}
+	// }
+	// glPopMatrix();
 }
 
 void drawSS()
@@ -316,8 +388,11 @@ void trigger()
 {
 	FlynnVector3 rv = axis;
 	FlynnVector3 ip = intersectPoint(rv, rp, plane_normal, pp);
-	cout<<ip<<endl;
-	intersections.push_back(ip);
+	if ((ip.x <= PLANE_SIDE && ip.x >= -1*PLANE_SIDE && ip.y <= PLANE_SIDE && ip.y >= -1*PLANE_SIDE && ip.z == PLANE_OFFSET))
+	{
+		cout << ip << endl;
+		intersections.push_back(ip);
+	}
 }
 
 /// q - all left
@@ -327,37 +402,29 @@ void trigger()
 /// a - cily up
 /// s - cily down
 
-void drawGun(){
-	drawPlane(PLANE_SIDE,PLANE_OFFSET);
-	for (auto i = intersections.begin(); i < intersections.end(); i++)
-	{
-		
-	}
-	
-
+void drawGun()
+{
+	drawPlane(PLANE_SIDE, PLANE_OFFSET);
+	drawBulletMarks();
 
 	glRotatef(rotate_all_angle, all_axis.x, all_axis.y, all_axis.z);
-	// glRotatef(rotate_all_angle, 0, 1, 0);
 
-	drawHemisphere(BIG_RADIUS,24,20,-1);
+	drawHemisphere(BIG_RADIUS, 24, 20, -1);
 
-	// glRotatef(rotate_hemi_angle, 1, 0, 0);
 	glRotatef(rotate_hemi_angle, cily_axis.x, cily_axis.y, cily_axis.z);
 
-	drawHemisphere(BIG_RADIUS,24,20,1);
+	drawHemisphere(BIG_RADIUS, 24, 20, 1);
 
-	glTranslatef(0, 0, BIG_RADIUS+SMALL_RADIUS);
+	glTranslatef(0, 0, BIG_RADIUS + SMALL_RADIUS);
 
-	// glRotatef(rotate_cily_angle, 1, 0, 1);
 	glRotatef(rotate_cily_angle, cily_axis.x, cily_axis.y, cily_axis.z);
 
 	glRotatef(rotateCylinderAngle, 0, 0, 1);
-	// glRotatef(rotateCylinderAngle, axis.x,axis.y,axis.z);
 
-	drawHemisphere(SMALL_RADIUS,12,10,-1);
-	drawCylinder(SMALL_RADIUS,CILYNDER_LENGTH,20);
-
-
+	drawHemisphere(SMALL_RADIUS, 12, 10, -1);
+	drawCylinder(SMALL_RADIUS, CILYNDER_LENGTH, 20);
+	glTranslatef(0, 0, CILYNDER_LENGTH);
+	drawInverseHemisphere(SMALL_RADIUS, 24, 20, 1);
 
 }
 
@@ -367,69 +434,69 @@ void keyboardListener(unsigned char key, int x, int y)
 	{
 
 	case '1':
-		rotate_left(3*UNIT);
+		rotate_left(3 * UNIT);
 		break;
 	case '2':
-		rotate_right(3*UNIT);
+		rotate_right(3 * UNIT);
 		break;
 	case '3':
-		rotate_up(3*UNIT);
+		rotate_up(3 * UNIT);
 		break;
 	case '4':
-		rotate_down(3*UNIT);
+		rotate_down(3 * UNIT);
 		break;
 	case '5':
-		tilt(3*UNIT);
+		tilt(3 * UNIT);
 		break;
 	case '6':
-		tilt(-3*UNIT);
+		tilt(-3 * UNIT);
 		break;
 	case 'd':
-		rotateCylinderAngle += 10;
+		rotateCylinderAngle += STEP;
 		break;
 	case 'f':
-		rotateCylinderAngle -= 10;
+		rotateCylinderAngle -= STEP;
 		break;
 	case 'q':
-		if(rotate_all_angle<rotate_all_range) 
+		if (rotate_all_angle < rotate_all_range)
 		{
-			rotate_all_angle += 10;
-			axis = axis.rotate(10,all_axis);
+			rotate_all_angle += STEP;
+			axis = axis.rotate(STEP, all_axis);
 		}
 		break;
 	case 'w':
-		if(rotate_all_angle>-1*rotate_all_range) 
+		if (rotate_all_angle > -1 * rotate_all_range)
 		{
-			rotate_all_angle -= 10;
-			axis = axis.rotate(-10,all_axis);
+			rotate_all_angle -= STEP;
+			axis = axis.rotate(-1*STEP, all_axis);
 		}
 		break;
 	case 'e':
-		if(rotate_hemi_angle<rotate_hemi_range) 
+		if (rotate_hemi_angle < rotate_hemi_range)
 		{
-			rotate_hemi_angle += 10;
-			axis = axis.rotate(10,cily_axis);
+			rotate_hemi_angle += STEP;
+			axis = axis.rotate(STEP, cily_axis);
 		}
 		break;
 	case 'r':
-		if(rotate_hemi_angle>-1*rotate_hemi_range) 
+		if (rotate_hemi_angle > -1 * rotate_hemi_range)
 		{
-			rotate_hemi_angle -= 10;
-			axis = axis.rotate(-10,cily_axis);
+			rotate_hemi_angle -= STEP;
+			axis = axis.rotate(-1*STEP, cily_axis);
 		}
 		break;
 	case 'a':
-		if(rotate_cily_angle<rotate_cily_range) 
+		if (rotate_cily_angle < rotate_cily_range)
 		{
-			rotate_cily_angle += 10;
-			axis = axis.rotate(+10,cily_axis);
+			rotate_cily_angle += STEP;
+			axis = axis.rotate(STEP, cily_axis);
 		}
 		break;
 	case 's':
-		if(rotate_cily_angle>-1*rotate_cily_range) 
+		if (rotate_cily_angle > -1 * rotate_cily_range)
 		{
-			rotate_cily_angle -= 10;
-			axis = axis.rotate(-10,cily_axis);
+			rotate_cily_angle -= STEP;
+			axis = axis.rotate(-1*STEP, cily_axis);
 		}
 		break;
 	default:
@@ -487,6 +554,7 @@ void mouseListener(int button, int state, int x, int y)
 
 	case GLUT_RIGHT_BUTTON:
 		//........
+		drawgrid = 1-drawgrid;
 		break;
 
 	case GLUT_MIDDLE_BUTTON:
@@ -497,8 +565,6 @@ void mouseListener(int button, int state, int x, int y)
 		break;
 	}
 }
-
-
 
 void display()
 {
@@ -597,15 +663,13 @@ void init()
 	l = FlynnVector3(-1 / sqrt(2), -1 / sqrt(2), 0);
 	r = FlynnVector3(-1 / sqrt(2), 1 / sqrt(2), 0);
 	u = FlynnVector3(0, 0, 1);
-	// pos = FlynnVector3(100, 100, 0);
-	pos = FlynnVector3(100,100,0);
+	pos = FlynnVector3(100, 100, 0);
 
-	FlynnVector3 arbitrary(1,0,0);
-	axis = FlynnVector3(0,0,1);
+	FlynnVector3 arbitrary(1, 0, 0);
+	axis = FlynnVector3(0, 0, 1);
 	all_axis = axis.cross(arbitrary).normalized();
 	cily_axis = axis.cross(all_axis).normalized();
 	plane_normal = axis;
-
 }
 
 int main(int argc, char **argv)
