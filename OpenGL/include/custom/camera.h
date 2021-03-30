@@ -8,7 +8,7 @@
 #include<custom/vectors.h>
 
 
-FlynnVector3 u,l,r,pos;
+Point3D u,l,r,pos;
 
 void up(float unit){
     pos += u*unit;

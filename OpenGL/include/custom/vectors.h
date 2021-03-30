@@ -6,70 +6,70 @@
 #define pi 3.14159
 #define DEGtoRED(x) (x * pi / 180)
 
-class FlynnVector3
+class Point3D
 {
 public:
 	float x, y, z;
-	FlynnVector3() : x(0), y(0), z(0){};
-	FlynnVector3(float X, float Y, float Z) : x(X), y(Y), z(Z) {}
-	FlynnVector3(const FlynnVector3& rhs):x(rhs.x), y(rhs.y), z(rhs.z){}
+	Point3D() : x(0), y(0), z(0){};
+	Point3D(float X, float Y, float Z) : x(X), y(Y), z(Z) {}
+	Point3D(const Point3D& rhs):x(rhs.x), y(rhs.y), z(rhs.z){}
 
 	float getLength() const { return sqrt((x * x) + (y * y) + (z * z)); }
 	void normalize() { *this /= getLength(); }
-	FlynnVector3 normalized() { return *this /= getLength(); }
-	float dot(FlynnVector3 rightVec) const { return (x * rightVec.x) + (y * rightVec.y) + (z * rightVec.z); }
-	FlynnVector3 cross(const FlynnVector3) const;
-	float angle(FlynnVector3);
-	float greaterAngle(FlynnVector3 rightVec) { return float((2 * pi) - angle(rightVec)); }
-	FlynnVector3 rotate(double A, const FlynnVector3 &r);
-	FlynnVector3 operator+(FlynnVector3) const;
-	FlynnVector3 operator-(FlynnVector3) const;
-	FlynnVector3 operator*(float) const;
-	FlynnVector3 operator/(float) const;
-	FlynnVector3 &operator+=(FlynnVector3);
-	FlynnVector3 &operator-=(FlynnVector3);
-	FlynnVector3 &operator*=(float);
-	FlynnVector3 &operator/=(float);
-	FlynnVector3 &operator=(FlynnVector3);
-	bool operator==(const FlynnVector3 &) const;
-	bool operator!=(const FlynnVector3 &) const;
+	Point3D normalized() { return *this /= getLength(); }
+	float dot(Point3D rightVec) const { return (x * rightVec.x) + (y * rightVec.y) + (z * rightVec.z); }
+	Point3D cross(const Point3D) const;
+	float angle(Point3D);
+	float greaterAngle(Point3D rightVec) { return float((2 * pi) - angle(rightVec)); }
+	Point3D rotate(double A, const Point3D &r);
+	Point3D operator+(Point3D) const;
+	Point3D operator-(Point3D) const;
+	Point3D operator*(float) const;
+	Point3D operator/(float) const;
+	Point3D &operator+=(Point3D);
+	Point3D &operator-=(Point3D);
+	Point3D &operator*=(float);
+	Point3D &operator/=(float);
+	Point3D &operator=(Point3D);
+	bool operator==(const Point3D &) const;
+	bool operator!=(const Point3D &) const;
 };
 
-FlynnVector3 FlynnVector3::cross(const FlynnVector3 rightVec) const
+Point3D Point3D::cross(const Point3D rightVec) const
 {
-	return FlynnVector3((y * rightVec.z) - (z * rightVec.y),
+	return Point3D((y * rightVec.z) - (z * rightVec.y),
 						(z * rightVec.x) - (x * rightVec.z),
 						(x * rightVec.y) - (y * rightVec.x));
 }
 
-float FlynnVector3::angle(FlynnVector3 rightVec)
+float Point3D::angle(Point3D rightVec)
 {
-	FlynnVector3 tempVec = normalized();
+	Point3D tempVec = normalized();
 	float temp = tempVec.dot(rightVec.normalized());
 	return float(acos(temp));
 }
 
-FlynnVector3 FlynnVector3::operator+(FlynnVector3 rightVec) const
+Point3D Point3D::operator+(Point3D rightVec) const
 {
-	return FlynnVector3(*this) += rightVec;
+	return Point3D(*this) += rightVec;
 }
 
-FlynnVector3 FlynnVector3::operator-(FlynnVector3 rightVec) const
+Point3D Point3D::operator-(Point3D rightVec) const
 {
-	return FlynnVector3(*this) -= rightVec;
+	return Point3D(*this) -= rightVec;
 }
 
-FlynnVector3 FlynnVector3::operator*(float scalar) const
+Point3D Point3D::operator*(float scalar) const
 {
-	return FlynnVector3(*this) *= scalar;
+	return Point3D(*this) *= scalar;
 }
 
-FlynnVector3 FlynnVector3::operator/(float scalar) const
+Point3D Point3D::operator/(float scalar) const
 {
-	return FlynnVector3(*this) /= scalar;
+	return Point3D(*this) /= scalar;
 }
 
-FlynnVector3 &FlynnVector3::operator+=(FlynnVector3 rightVec)
+Point3D &Point3D::operator+=(Point3D rightVec)
 {
 	x += rightVec.x;
 	y += rightVec.y;
@@ -77,7 +77,7 @@ FlynnVector3 &FlynnVector3::operator+=(FlynnVector3 rightVec)
 	return *this;
 }
 
-FlynnVector3 &FlynnVector3::operator-=(FlynnVector3 rightVec)
+Point3D &Point3D::operator-=(Point3D rightVec)
 {
 	x -= rightVec.x;
 	y -= rightVec.y;
@@ -85,7 +85,7 @@ FlynnVector3 &FlynnVector3::operator-=(FlynnVector3 rightVec)
 	return *this;
 }
 
-FlynnVector3 &FlynnVector3::operator*=(float scalar)
+Point3D &Point3D::operator*=(float scalar)
 {
 	x *= scalar;
 	y *= scalar;
@@ -93,7 +93,7 @@ FlynnVector3 &FlynnVector3::operator*=(float scalar)
 	return *this;
 }
 
-FlynnVector3 &FlynnVector3::operator/=(float scalar)
+Point3D &Point3D::operator/=(float scalar)
 {
 	x /= scalar;
 	y /= scalar;
@@ -101,7 +101,7 @@ FlynnVector3 &FlynnVector3::operator/=(float scalar)
 	return *this;
 }
 
-FlynnVector3 &FlynnVector3::operator=(FlynnVector3 rightVec)
+Point3D &Point3D::operator=(Point3D rightVec)
 {
 	x = rightVec.x;
 	y = rightVec.y;
@@ -109,38 +109,38 @@ FlynnVector3 &FlynnVector3::operator=(FlynnVector3 rightVec)
 	return *this;
 }
 
-bool FlynnVector3::operator==(const FlynnVector3 &rightVec) const
+bool Point3D::operator==(const Point3D &rightVec) const
 {
 	return (x == rightVec.x &&
 			y == rightVec.y &&
 			z == rightVec.z);
 }
 
-bool FlynnVector3::operator!=(const FlynnVector3 &rightVec) const
+bool Point3D::operator!=(const Point3D &rightVec) const
 {
 	return !operator==(rightVec);
 }
 
-std::ostream &operator<<(std::ostream &sout, const FlynnVector3 &p)
+std::ostream &operator<<(std::ostream &sout, const Point3D &p)
 {
 	sout << "(" << p.x << "," << p.y << "," << p.z << ")";
 	return sout;
 }
-std::istream &	operator>>(std::istream &sin, FlynnVector3 &p)
+std::istream &	operator>>(std::istream &sin, Point3D &p)
 {
 	sin >> p.x >> p.y >> p.z;
 	return sin;
 }
-FlynnVector3 FlynnVector3::rotate(double A, const FlynnVector3 &r)
+Point3D Point3D::rotate(double A, const Point3D &r)
 {
 	A = DEGtoRED(A);
-	FlynnVector3 l = *this;
-	FlynnVector3 u = r.cross(l);
+	Point3D l = *this;
+	Point3D u = r.cross(l);
 	return u * sin(A) + l * cos(A);
 }
 
-FlynnVector3 intersectPoint(FlynnVector3 rayVector, FlynnVector3 rayPoint, FlynnVector3 planeNormal, FlynnVector3 planePoint) {
-	FlynnVector3 diff = rayPoint - planePoint;
+Point3D intersectPoint(Point3D rayVector, Point3D rayPoint, Point3D planeNormal, Point3D planePoint) {
+	Point3D diff = rayPoint - planePoint;
 	double prod1 = diff.dot(planeNormal);
 	double prod2 = rayVector.dot(planeNormal);
 	double prod3 = prod1 / prod2;

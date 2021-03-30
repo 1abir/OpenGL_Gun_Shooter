@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
 #include <windows.h>
 #include <glut.h>
 
 #include <vector>
+
 #include <custom/camera.h>
 
 using namespace std;
@@ -18,8 +18,8 @@ using namespace std;
 #define PLANE_SIDE 50
 #define PLANE_OFFSET (BIG_RADIUS + SMALL_RADIUS + CILYNDER_LENGTH * 2)
 
-FlynnVector3 axis, all_axis, cily_axis, plane_normal;
-vector<FlynnVector3> intersections;
+Point3D axis, all_axis, cily_axis, plane_normal;
+vector<Point3D> intersections;
 
 float rotateCylinderAngle = 0;
 float rotate_all_angle = 0;
@@ -157,47 +157,6 @@ void drawCone(double radius, double height, int segments)
 	}
 }
 
-void drawSphere(double radius, int slices, int stacks)
-{
-	struct point points[100][100];
-	int i, j;
-	double h, r;
-	//generate points
-	for (i = 0; i <= stacks; i++)
-	{
-		h = radius * sin(((double)i / (double)stacks) * (pi / 2));
-		r = radius * cos(((double)i / (double)stacks) * (pi / 2));
-		for (j = 0; j <= slices; j++)
-		{
-			points[i][j].x = r * cos(((double)j / (double)slices) * 2 * pi);
-			points[i][j].y = r * sin(((double)j / (double)slices) * 2 * pi);
-			points[i][j].z = h;
-		}
-	}
-	//draw quads using generated points
-	for (i = 0; i < stacks; i++)
-	{
-		glColor3f((double)i / (double)stacks, (double)i / (double)stacks, (double)i / (double)stacks);
-		for (j = 0; j < slices; j++)
-		{
-			glBegin(GL_QUADS);
-			{
-				//upper hemisphere
-				glVertex3f(points[i][j].x, points[i][j].y, points[i][j].z);
-				glVertex3f(points[i][j + 1].x, points[i][j + 1].y, points[i][j + 1].z);
-				glVertex3f(points[i + 1][j + 1].x, points[i + 1][j + 1].y, points[i + 1][j + 1].z);
-				glVertex3f(points[i + 1][j].x, points[i + 1][j].y, points[i + 1][j].z);
-				//lower hemisphere
-				glVertex3f(points[i][j].x, points[i][j].y, -points[i][j].z);
-				glVertex3f(points[i][j + 1].x, points[i][j + 1].y, -points[i][j + 1].z);
-				glVertex3f(points[i + 1][j + 1].x, points[i + 1][j + 1].y, -points[i + 1][j + 1].z);
-				glVertex3f(points[i + 1][j].x, points[i + 1][j].y, -points[i + 1][j].z);
-			}
-			glEnd();
-		}
-	}
-}
-
 void drawHemisphere(double radius, int slices, int stacks, int upper_hemisphere)
 {
 	struct point points[100][100];
@@ -283,15 +242,15 @@ void drawCylinder(float radius, float height, int segments)
 {
 	int i;
 	float shade;
-	FlynnVector3 points[100];
-	//generate points
+	Point3D points[100];
+	
 	for (i = 0; i <= segments; i++)
 	{
 		points[i].x = radius * cos(((double)i / (double)segments) * pi * 2);
 		points[i].y = radius * sin(((double)i / (double)segments) * pi * 2);
 	}
 	glColor3f(0, 1.0, 0);
-	//draw triangles using generated points
+	
 	for (i = 0; i < segments; i++)
 	{
 		if (i % 2)
@@ -344,50 +303,20 @@ void drawBulletMarks()
 
 		for (auto i = intersections.begin(); i < intersections.end(); i++)
 		{
-			FlynnVector3 temp = *i;
+			Point3D temp = *i;
 			drawPoint(temp.x,temp.y,temp.z-2);
 		}
 	// }
 	// glPopMatrix();
 }
 
-void drawSS()
-{
-	glColor3f(1, 0, 0);
-	drawSquare(20);
-
-	glRotatef(angle, 0, 0, 1);
-	glTranslatef(110, 0, 0);
-	//glRotatef(2*angle,0,0,1);
-	glColor3f(0, 1, 0);
-	drawSquare(15);
-
-	glPushMatrix();
-	{
-		glRotatef(9 * angle, 0, 0, 1);
-		glTranslatef(60, 0, 0);
-		glRotatef(2 * angle, 0, 0, 1);
-		glColor3f(0, 0, 1);
-		//drawSquare(10);
-	}
-	glPopMatrix();
-
-	glRotatef(2 * angle, 0, 0, 1);
-	glTranslatef(40, 0, 0);
-	glColor3f(1, 0, 0);
-	//glRotatef(4*angle,0,0,1);
-	//drawSquare(2.5);
-	glRotatef(4 * angle, 0, 0, 1);
-	glColor3f(1, 1, 0);
-	drawSquare(5);
-}
-FlynnVector3 rp = FlynnVector3(0.0, 0.0, 0.0);
-FlynnVector3 pp = FlynnVector3(0.0, 0.0, PLANE_OFFSET);
+Point3D rp = Point3D(0.0, 0.0, 0.0);
+Point3D pp = Point3D(0.0, 0.0, PLANE_OFFSET);
 
 void trigger()
 {
-	FlynnVector3 rv = axis;
-	FlynnVector3 ip = intersectPoint(rv, rp, plane_normal, pp);
+	Point3D rv = axis;
+	Point3D ip = intersectPoint(rv, rp, plane_normal, pp);
 	if ((ip.x <= PLANE_SIDE && ip.x >= -1*PLANE_SIDE && ip.y <= PLANE_SIDE && ip.y >= -1*PLANE_SIDE && ip.z == PLANE_OFFSET))
 	{
 		cout << ip << endl;
@@ -395,15 +324,10 @@ void trigger()
 	}
 }
 
-/// q - all left
-/// w - all right
-/// e - hemi up
-/// r - hemi down
-/// a - cily up
-/// s - cily down
-
 void drawGun()
 {
+
+
 	drawPlane(PLANE_SIDE, PLANE_OFFSET);
 	drawBulletMarks();
 
@@ -421,10 +345,10 @@ void drawGun()
 
 	glRotatef(rotateCylinderAngle, 0, 0, 1);
 
-	drawHemisphere(SMALL_RADIUS, 12, 10, -1);
+	drawHemisphere(SMALL_RADIUS, 20, 10, -1);
 	drawCylinder(SMALL_RADIUS, CILYNDER_LENGTH, 20);
 	glTranslatef(0, 0, CILYNDER_LENGTH);
-	drawInverseHemisphere(SMALL_RADIUS, 24, 20, 1);
+	drawInverseHemisphere(SMALL_RADIUS, 20, 10, 1);
 
 }
 
@@ -554,7 +478,8 @@ void mouseListener(int button, int state, int x, int y)
 
 	case GLUT_RIGHT_BUTTON:
 		//........
-		drawgrid = 1-drawgrid;
+		if (state == GLUT_DOWN)
+			drawgrid = 1-drawgrid;
 		break;
 
 	case GLUT_MIDDLE_BUTTON:
@@ -635,7 +560,7 @@ void animate()
 void init()
 {
 	//codes for initialization
-	drawgrid = 0;
+	drawgrid = 1;
 	drawaxes = 1;
 	cameraHeight = 150.0;
 	cameraAngle = 1.0;
@@ -660,13 +585,19 @@ void init()
 	//near distance
 	//far distance
 
-	l = FlynnVector3(-1 / sqrt(2), -1 / sqrt(2), 0);
-	r = FlynnVector3(-1 / sqrt(2), 1 / sqrt(2), 0);
-	u = FlynnVector3(0, 0, 1);
-	pos = FlynnVector3(100, 100, 0);
+	// l = Point3D(-1 / sqrt(2), -1 / sqrt(2), 0);
+	// r = Point3D(-1 / sqrt(2), 1 / sqrt(2), 0);
+	// u = Point3D(0, 0, 1);
+	l = Point3D(1,0,0);
+	r = Point3D(0,0,1);
+	u = r.cross(l); // 0,-1,0
 
-	FlynnVector3 arbitrary(1, 0, 0);
-	axis = FlynnVector3(0, 0, 1);
+	// cout<<(u.cross(r)) << l.cross(u)<<endl;
+
+	pos = Point3D(-100, 0, 0);
+
+	Point3D arbitrary(1, 0, 0);
+	axis = Point3D(0, 0, 1);
 	all_axis = axis.cross(arbitrary).normalized();
 	cily_axis = axis.cross(all_axis).normalized();
 	plane_normal = axis;

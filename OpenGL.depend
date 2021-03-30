@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1616128335 source:c:\users\abirm\onedrive - ugrad.cse.buet.ac.bd\academic\4-1\graphics sessional\offline1\opengl_codeblocks\main.cpp
+1616298798 source:c:\users\abirm\onedrive - ugrad.cse.buet.ac.bd\academic\4-1\graphics sessional\offline1\opengl_codeblocks\main.cpp
 	<stdio.h>
 	<stdlib.h>
 	<math.h>
@@ -13,11 +13,11 @@
 	<GL/gl.h>
 	<GL/glu.h>
 
-1616064241 c:\users\abirm\onedrive - ugrad.cse.buet.ac.bd\academic\4-1\graphics sessional\offline1\opengl_codeblocks\opengl\include\custom\camera.h
+1616129277 c:\users\abirm\onedrive - ugrad.cse.buet.ac.bd\academic\4-1\graphics sessional\offline1\opengl_codeblocks\opengl\include\custom\camera.h
 	<math.h>
 	<custom/vectors.h>
 
-1616087816 c:\users\abirm\onedrive - ugrad.cse.buet.ac.bd\academic\4-1\graphics sessional\offline1\opengl_codeblocks\opengl\include\custom\vectors.h
+1616264836 c:\users\abirm\onedrive - ugrad.cse.buet.ac.bd\academic\4-1\graphics sessional\offline1\opengl_codeblocks\opengl\include\custom\vectors.h
 	<cmath>
 	<iostream>
 
